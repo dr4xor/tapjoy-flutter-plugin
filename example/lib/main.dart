@@ -33,7 +33,7 @@ class _MyAppState extends State<MyApp> {
     }
     try {
       // await Tapjoy.connect(context, () => tapjoyStatus = 'connnect',
-      await Tapjoy.connect("J6O0mKuBSUSUBk1mq7Ya2AEC2JOHMmmMKxjRCgJrmO9HLzE6xBMMFRF01aNM", () => tapjoyStatus = 'connnect',
+      await Tapjoy.connect(TAPJOY_KEY, () => tapjoyStatus = 'connnect',
           () => tapjoyStatus = 'failed');
     } catch (e) {
       print(e.toString()+'//\******************************************************');
