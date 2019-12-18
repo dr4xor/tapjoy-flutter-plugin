@@ -19,7 +19,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  String _tapjoyStatus = 'Initializing Connecting';
+  String _tapjoyStatus = 'Initializing';
   var active;
 
   @override
