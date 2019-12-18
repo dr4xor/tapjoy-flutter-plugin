@@ -3,8 +3,14 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:tapjoy/tapjoy.dart';
+import 'package:tapjoy/tJPlacementListener.dart';
 
-void main() => runApp(MyApp());
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+Future main() async {
+  await DotEnv().load('.env');
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -13,7 +19,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  String _tapjoyStatus = 'Not connected yet';
+  String _tapjoyStatus = 'Initializing Connecting';
+  var active;
 
   @override
   void initState() {
@@ -24,20 +31,19 @@ class _MyAppState extends State<MyApp> {
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     String platformVersion;
-    String tapjoyStatus;
-    // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       platformVersion = await Tapjoy.platformVersion;
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
-    try {
-      // await Tapjoy.connect(context, () => tapjoyStatus = 'connnect',
-      await Tapjoy.connect(TAPJOY_KEY, () => tapjoyStatus = 'connnect',
-          () => tapjoyStatus = 'failed');
-    } catch (e) {
-      print(e.toString()+'//\******************************************************');
-    }
+
+    Tapjoy.setDebugEnabled(true);
+    Tapjoy.connect(
+        DotEnv().env['TAPJOY_KEY'],
+        tapjoyConnectSuccess,
+        () => setState(() {
+              _tapjoyStatus = 'failed';
+            }));
 
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
@@ -46,8 +52,15 @@ class _MyAppState extends State<MyApp> {
 
     setState(() {
       _platformVersion = platformVersion;
-      _tapjoyStatus = tapjoyStatus;
     });
+  }
+
+  void tapjoyConnectSuccess() {
+    setState(() {
+      _tapjoyStatus = 'connected';
+    });
+    // Tapjoy.isConnected();
+    Tapjoy.getPlacement("placementName", new TJPlacementListener());
   }
 
   @override

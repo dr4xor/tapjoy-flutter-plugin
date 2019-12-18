@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
 import 'tJPlacement.dart';
 import 'tJPlacementListener.dart';
+import 'dart:convert';
 
 class Tapjoy {
   static const MethodChannel _channel = const MethodChannel('tapjoy');
@@ -41,8 +43,16 @@ class Tapjoy {
 
   static Future<TJPlacement> getPlacement(
       String placementName, TJPlacementListener listener) async {
-    TJPlacement tjPlacement = await _channel.invokeMethod<TJPlacement>(
-        'getPlacement', {"placementName": placementName, "listener": listener});    
+    // TJPlacement tjPlacement = await _channel.invokeMethod<TJPlacement>(
+    //     'getPlacement', {"placementName": placementName}, "listener": listener});
+    final result = await _channel.invokeMethod<Map<dynamic, dynamic>>(
+        'getPlacement', {"placementName": placementName});
+    // final gUID = result['GUID'] as String;
+    // final id = result['Id'] as String;
+    // final name = result['Name'] as String;
+    // final videoListener = result['VideoListener'];
+    // final corePlacement = result['CorePlacement'];
+    return new TJPlacement(result['placement']);
   }
 
   static void setUserID(String userID) async {
