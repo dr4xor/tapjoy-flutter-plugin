@@ -1,14 +1,14 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
 class TJPlacement {
-  Uint8List platformPlacement;
+  String placementName;
   static const MethodChannel _channel = const MethodChannel('tJPlacement');
-  TJPlacement (this.platformPlacement);
+  TJPlacement(this.placementName);
 
-  void requestContent() async {
-    await _channel.invokeMethod('requestContent', {'placement': platformPlacement});
-  }
+  // static void isContentAvailable() async {
+  //   bool contentStatus = await _channel
+  //       .invokeMethod('isContentAvailable', {'placementName': 'offerwall'});
+  // }
 }

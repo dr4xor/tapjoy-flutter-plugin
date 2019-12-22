@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:tapjoy/tapjoy.dart';
 import 'package:tapjoy/tJPlacementListener.dart';
+import 'package:tapjoy/tJPlacement.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -36,10 +37,10 @@ class _MyAppState extends State<MyApp> {
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
-
     Tapjoy.setDebugEnabled(true);
     Tapjoy.connect(
         DotEnv().env['TAPJOY_KEY'],
+        // "pqRbeIEcSHqjTgpN3zuVEwECKLDGUq3y0sIKMQmqH5mv0SKukE4DO9cmG6f9",
         tapjoyConnectSuccess,
         () => setState(() {
               _tapjoyStatus = 'failed';
@@ -60,7 +61,7 @@ class _MyAppState extends State<MyApp> {
       _tapjoyStatus = 'connected';
     });
     // Tapjoy.isConnected();
-    Tapjoy.getPlacement("placementName", new TJPlacementListener());
+    Tapjoy.getPlacement("mohamed", new TJPlacementListener());
   }
 
   @override
@@ -70,9 +71,17 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text(
-              'Running on: $_platformVersion\n Tapjay Status = $_tapjoyStatus'),
+        body: Column(
+          children: <Widget>[
+            RaisedButton(
+              child: Text('is Content Available'),
+              onPressed: () => Tapjoy.isContentAvailable(),
+            ),
+            Center(
+              child: Text(
+                  'Running on: $_platformVersion\n Tapjay Status = $_tapjoyStatus'),
+            ),
+          ],
         ),
       ),
     );

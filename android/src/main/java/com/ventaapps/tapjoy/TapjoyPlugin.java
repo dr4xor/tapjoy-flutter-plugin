@@ -18,6 +18,7 @@ import com.tapjoy.TJError;
 import com.tapjoy.TJPlacement;
 import com.tapjoy.TJPlacementListener;
 import com.tapjoy.Tapjoy;
+import com.tapjoy.TapjoyAuctionFlags;
 import com.tapjoy.TapjoyConnectFlag;
 
 import java.io.ByteArrayOutputStream;
@@ -37,8 +38,8 @@ public class TapjoyPlugin implements MethodCallHandler {
      * Plugin registration.
      */
     static MethodChannel channel;
+    static Map<String, TJPlacement> placements = new HashMap<>();
     private final Activity activity;
-    public Map<String, String> mapData = new HashMap<>();
 
     public static void registerWith(Registrar registrar) {
         channel = new MethodChannel(registrar.messenger(), "tapjoy");
@@ -81,7 +82,58 @@ public class TapjoyPlugin implements MethodCallHandler {
             TJPlacementListener placementListener = new TJPlacementListener() {
                 @Override
                 public void onRequestSuccess(TJPlacement tjPlacement) {
+                    channel.invokeMethod("placementRequestSuccess", tjPlacement.getName());
+                }
 
+                @Override
+                public void onRequestFailure(TJPlacement tjPlacement, TJError tjError) {
+
+                }
+
+                @Override
+                public void onContentReady(TJPlacement tjPlacement) {
+                }
+
+                @Override
+                public void onContentShow(TJPlacement tjPlacement) {
+
+                }
+
+                @Override
+                public void onContentDismiss(TJPlacement tjPlacement) {
+
+                }
+
+                @Override
+                public void onPurchaseRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s) {
+
+                }
+
+                @Override
+                public void onRewardRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s, int i) {
+
+                }
+
+                @Override
+                public void onClick(TJPlacement tjPlacement) {
+
+                }
+            };
+            String placementName = call.argument("placementName");
+//      TJPlacementListener placementListener = call.argument("listener");
+            TJPlacement placement = Tapjoy.getPlacement(placementName, placementListener);
+            this.placements.put(placementName, placement);
+            Map<String, String> mapRef = new HashMap<>();
+            mapRef.put("Name", placement.getName());
+            result.success(mapRef);
+        } else if (call.method.equals("isContentAvailable")) {
+            String placementName = call.argument("placementName");
+//            TJPlacement placement = TapjoyPlugin.placements.get(placementName);
+//            boolean contentStatus = placement.isContentAvailable();
+            TJPlacementListener placementListener = new TJPlacementListener() {
+                @Override
+                public void onRequestSuccess(TJPlacement tjPlacement) {
+//                    channel.invokeMethod("placementRequestSuccess", tjPlacement.getName());
                 }
 
                 @Override
@@ -119,34 +171,10 @@ public class TapjoyPlugin implements MethodCallHandler {
 
                 }
             };
-
-            String placementName = call.argument("placementName");
-//      TJPlacementListener placementListener = call.argument("listener");
             TJPlacement placement = Tapjoy.getPlacement(placementName, placementListener);
-            try {
-                Map<Object, Object> mapData = new HashMap<>();
-//        mapData.put("GUID", placement.getGUID());
-//        mapData.put("Id", placement.pushId);
-//        mapData.put("Name", placement.getName());
-//        mapData.put("VideoListener", placement.getVideoListener());
-
-
-//        Map<Object, Object> mapCorePlacement = new HashMap<>();
-//        Field fCorePlacement = placement.getClass().getDeclaredField("b");
-//        fCorePlacement.setAccessible(true);
-//        TJCorePlacement corePlacement = (TJCorePlacement) fCorePlacement.get(placement);
-//        mapData.put("CorePlacement", corePlacement);
-
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ObjectOutputStream oos = new ObjectOutputStream(bos);
-                oos.writeObject(placement);
-                oos.flush();
-                byte[] data = bos.toByteArray();
-                mapData.put("placement", data);
-                result.success(mapData);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            boolean contentStatus = placement.isContentAvailable();
+            Log.e("mohamed", String.valueOf(contentStatus));
+            result.success(contentStatus);
         } else if (call.method.equals("setUserID")) {
             String userID = call.argument("userID");
             Tapjoy.setUserID(userID);

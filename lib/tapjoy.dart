@@ -7,6 +7,9 @@ import 'tJPlacement.dart';
 import 'tJPlacementListener.dart';
 import 'dart:convert';
 
+// old key
+// J6O0mKuBSUSUBk1mq7Ya2AEC2JOHMmmMKxjRCgJrmO9HLzE6xBMMFRF01aNM
+
 class Tapjoy {
   static const MethodChannel _channel = const MethodChannel('tapjoy');
 
@@ -47,12 +50,16 @@ class Tapjoy {
     //     'getPlacement', {"placementName": placementName}, "listener": listener});
     final result = await _channel.invokeMethod<Map<dynamic, dynamic>>(
         'getPlacement', {"placementName": placementName});
-    // final gUID = result['GUID'] as String;
-    // final id = result['Id'] as String;
-    // final name = result['Name'] as String;
-    // final videoListener = result['VideoListener'];
-    // final corePlacement = result['CorePlacement'];
-    return new TJPlacement(result['placement']);
+    final name = result['Name'] as String;
+    new TJPlacement(name);
+    // return new TJPlacement(placementName);
+  }
+
+  static Future<bool> isContentAvailable() async {
+    bool contentStatus = await _channel
+        .invokeMethod('isContentAvailable', {'placementName': 'mohamed'});
+    print('$contentStatus******************************************');   
+    return contentStatus; 
   }
 
   static void setUserID(String userID) async {

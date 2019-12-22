@@ -39,30 +39,16 @@ public class TJPlacementPlugin implements MethodCallHandler {
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {
-        if (call.method.equals("requestContent")) {
-            try {
-                TJPlacement placement = (TJPlacement) deserialize((byte[]) call.argument("placement"));
-                placement.requestContent();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else {
-            result.notImplemented();
+//        if (call.method.equals("requestContent")) {
+
+//            if(placement != null){
+//                placement.requestContent();
+//        }
+        if (call.method.equals("isContentAvailable")) {
+            String placementName = call.argument("placementName");
+            TJPlacement placement = TapjoyPlugin.placements.get(placementName);
+            boolean contentStatus = placement.isContentAvailable();
+            result.success(contentStatus);
         }
-    }
-
-    public static byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
-        os.writeObject(obj);
-        return out.toByteArray();
-    }
-
-    public static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        ObjectInputStream is = new ObjectInputStream(in);
-        return is.readObject();
     }
 }
