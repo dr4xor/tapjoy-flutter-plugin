@@ -30,16 +30,13 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * TapjoyPlugin
- */
-public class TapjoyPlugin implements MethodCallHandler {
-    /**
-     * Plugin registration.
-     */
+
+public class TapjoyPlugin implements MethodCallHandler, TJPlacementListener {
+
     static MethodChannel channel;
     static Map<String, TJPlacement> placements = new HashMap<>();
     private final Activity activity;
+    private TJPlacementListener placementListener = this;
 
     public static void registerWith(Registrar registrar) {
         channel = new MethodChannel(registrar.messenger(), "tapjoy");
@@ -52,13 +49,13 @@ public class TapjoyPlugin implements MethodCallHandler {
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {
-        if (call.method.equals("getPlatformVersion")) {
-            result.success("Android " + android.os.Build.VERSION.RELEASE);
-        } else if (call.method.equals("setDebugEnabled")) {
+        if (call.method.equals("setDebugEnabled")) {
             boolean isDebug = call.argument("isDebug");
             Tapjoy.setDebugEnabled(isDebug);
+            result.success(null);
         } else if (call.method.equals("setActivity")) {
             Tapjoy.setActivity(this.activity);
+            result.success(null);
         } else if (call.method.equals("isConnected")) {
             if (Tapjoy.isConnected())
                 result.success(null);
@@ -70,6 +67,7 @@ public class TapjoyPlugin implements MethodCallHandler {
             Tapjoy.connect(this.activity, tapjoyKey, connectFlags, new TJConnectListener() {
                 @Override
                 public void onConnectSuccess() {
+                    TJPlacement p = new TJPlacement(activity, "MyPlacementName", placementListener);
                     channel.invokeMethod("connect", "success");
                 }
 
@@ -79,98 +77,13 @@ public class TapjoyPlugin implements MethodCallHandler {
                 }
             });
         } else if (call.method.equals("getPlacement")) {
-            TJPlacementListener placementListener = new TJPlacementListener() {
-                @Override
-                public void onRequestSuccess(TJPlacement tjPlacement) {
-                    channel.invokeMethod("placementRequestSuccess", tjPlacement.getName());
-                }
-
-                @Override
-                public void onRequestFailure(TJPlacement tjPlacement, TJError tjError) {
-
-                }
-
-                @Override
-                public void onContentReady(TJPlacement tjPlacement) {
-                }
-
-                @Override
-                public void onContentShow(TJPlacement tjPlacement) {
-
-                }
-
-                @Override
-                public void onContentDismiss(TJPlacement tjPlacement) {
-
-                }
-
-                @Override
-                public void onPurchaseRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s) {
-
-                }
-
-                @Override
-                public void onRewardRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s, int i) {
-
-                }
-
-                @Override
-                public void onClick(TJPlacement tjPlacement) {
-
-                }
-            };
             String placementName = call.argument("placementName");
-//      TJPlacementListener placementListener = call.argument("listener");
             TJPlacement placement = Tapjoy.getPlacement(placementName, placementListener);
-            this.placements.put(placementName, placement);
             Map<String, String> mapRef = new HashMap<>();
             mapRef.put("Name", placement.getName());
             result.success(mapRef);
         } else if (call.method.equals("isContentAvailable")) {
             String placementName = call.argument("placementName");
-//            TJPlacement placement = TapjoyPlugin.placements.get(placementName);
-//            boolean contentStatus = placement.isContentAvailable();
-            TJPlacementListener placementListener = new TJPlacementListener() {
-                @Override
-                public void onRequestSuccess(TJPlacement tjPlacement) {
-//                    channel.invokeMethod("placementRequestSuccess", tjPlacement.getName());
-                }
-
-                @Override
-                public void onRequestFailure(TJPlacement tjPlacement, TJError tjError) {
-
-                }
-
-                @Override
-                public void onContentReady(TJPlacement tjPlacement) {
-
-                }
-
-                @Override
-                public void onContentShow(TJPlacement tjPlacement) {
-
-                }
-
-                @Override
-                public void onContentDismiss(TJPlacement tjPlacement) {
-
-                }
-
-                @Override
-                public void onPurchaseRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s) {
-
-                }
-
-                @Override
-                public void onRewardRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s, int i) {
-
-                }
-
-                @Override
-                public void onClick(TJPlacement tjPlacement) {
-
-                }
-            };
             TJPlacement placement = Tapjoy.getPlacement(placementName, placementListener);
             boolean contentStatus = placement.isContentAvailable();
             Log.e("mohamed", String.valueOf(contentStatus));
@@ -184,5 +97,99 @@ public class TapjoyPlugin implements MethodCallHandler {
         } else {
             result.notImplemented();
         }
+    }
+
+    //  TJPlacementListener Methods
+    @Override
+    public void onRequestSuccess(TJPlacement tjPlacement) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                channel.invokeMethod("onRequestSuccess", null);
+            }
+        });
+    }
+
+    @Override
+    public void onRequestFailure(TJPlacement tjPlacement, final TJError tjError) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Map<String, Object> arguments = new HashMap<>();
+                arguments.put("code", tjError.code);
+                arguments.put("message", tjError.message);
+                channel.invokeMethod("onRequestFailure", arguments);
+            }
+        });
+    }
+
+    @Override
+    public void onContentReady(TJPlacement tjPlacement) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                channel.invokeMethod("onContentReady", null);
+            }
+        });
+    }
+
+    @Override
+    public void onContentShow(TJPlacement tjPlacement) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                channel.invokeMethod("onContentShow", null);
+            }
+        });
+    }
+
+    @Override
+    public void onContentDismiss(TJPlacement tjPlacement) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                channel.invokeMethod("onContentDismiss", null);
+            }
+        });
+    }
+
+    @Override
+    public void onPurchaseRequest(TJPlacement tjPlacement, final TJActionRequest tjActionRequest, final String s) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Map<String, Object> arguments = new HashMap<>();
+                arguments.put("requestId", tjActionRequest.getRequestId());
+                arguments.put("token", tjActionRequest.getToken());
+                arguments.put("s", s);
+                channel.invokeMethod("", arguments);
+            }
+        });
+    }
+
+    @Override
+    public void onRewardRequest(final TJPlacement tjPlacement, final TJActionRequest tjActionRequest, final String s, final int i) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Map<String, Object> arguments = new HashMap<>();
+                arguments.put("requestId", tjActionRequest.getRequestId());
+                arguments.put("token", tjActionRequest.getToken());
+                arguments.put("s", s);
+                arguments.put("i", i);
+                channel.invokeMethod("onRewardRequest", arguments);
+            }
+        });
+    }
+
+    @Override
+    public void onClick(final TJPlacement tjPlacement) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                channel.invokeMethod("onClick", null);
+            }
+        });
     }
 }

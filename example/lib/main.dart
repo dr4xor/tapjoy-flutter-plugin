@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:tapjoy/tapjoy.dart';
 import 'package:tapjoy/tJPlacementListener.dart';
-import 'package:tapjoy/tJPlacement.dart';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future main() async {
@@ -31,29 +27,22 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    String platformVersion;
-    try {
-      platformVersion = await Tapjoy.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
     Tapjoy.setDebugEnabled(true);
     Tapjoy.connect(
-        DotEnv().env['TAPJOY_KEY'],
-        // "pqRbeIEcSHqjTgpN3zuVEwECKLDGUq3y0sIKMQmqH5mv0SKukE4DO9cmG6f9",
-        tapjoyConnectSuccess,
-        () => setState(() {
-              _tapjoyStatus = 'failed';
-            }));
+      DotEnv().env['TAPJOY_KEY'],
+      // "pqRbeIEcSHqjTgpN3zuVEwECKLDGUq3y0sIKMQmqH5mv0SKukE4DO9cmG6f9",
+      tapjoyConnectSuccess,
+      () => setState(
+        () {
+          _tapjoyStatus = 'failed';
+        },
+      ),
+    );
 
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
     if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   void tapjoyConnectSuccess() {
@@ -61,7 +50,7 @@ class _MyAppState extends State<MyApp> {
       _tapjoyStatus = 'connected';
     });
     // Tapjoy.isConnected();
-    Tapjoy.getPlacement("mohamed", new TJPlacementListener());
+    // Tapjoy.getPlacement("mohamed", new TJPlacementListener());
   }
 
   @override
@@ -78,8 +67,7 @@ class _MyAppState extends State<MyApp> {
               onPressed: () => Tapjoy.isContentAvailable(),
             ),
             Center(
-              child: Text(
-                  'Running on: $_platformVersion\n Tapjay Status = $_tapjoyStatus'),
+              child: Text('Tapjay Status = $_tapjoyStatus'),
             ),
           ],
         ),
