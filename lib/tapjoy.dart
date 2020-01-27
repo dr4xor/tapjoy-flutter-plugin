@@ -2,8 +2,6 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:tapjoy/models.dart';
 
-// old key
-// J6O0mKuBSUSUBk1mq7Ya2AEC2JOHMmmMKxjRCgJrmO9HLzE6xBMMFRF01aNM
 
 class Tapjoy {
   static const MethodChannel _channel = const MethodChannel('tapjoy');
