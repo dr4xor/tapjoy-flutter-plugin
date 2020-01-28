@@ -154,29 +154,29 @@ public class TapjoyPlugin implements MethodCallHandler, TJPlacementListener {
     }
 
     @Override
-    public void onPurchaseRequest(TJPlacement tjPlacement, final TJActionRequest tjActionRequest, final String s) {
+    public void onPurchaseRequest(TJPlacement tjPlacement, final TJActionRequest tjActionRequest, final String productId) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Map<String, Object> arguments = new HashMap<>();
                 arguments.put("requestId", tjActionRequest.getRequestId());
                 arguments.put("token", tjActionRequest.getToken());
-                arguments.put("s", s);
+                arguments.put("productId", productId);
                 channel.invokeMethod("", arguments);
             }
         });
     }
 
     @Override
-    public void onRewardRequest(final TJPlacement tjPlacement, final TJActionRequest tjActionRequest, final String s, final int i) {
+    public void onRewardRequest(final TJPlacement tjPlacement, final TJActionRequest tjActionRequest, final String itemId, final int quantity) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Map<String, Object> arguments = new HashMap<>();
                 arguments.put("requestId", tjActionRequest.getRequestId());
                 arguments.put("token", tjActionRequest.getToken());
-                arguments.put("s", s);
-                arguments.put("i", i);
+                arguments.put("itemId", itemId);
+                arguments.put("quantity", quantity);
                 channel.invokeMethod("onRewardRequest", arguments);
             }
         });

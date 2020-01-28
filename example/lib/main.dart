@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tapjoy/models.dart';
 import 'dart:async';
 import 'package:tapjoy/tapjoy.dart';
-import 'package:tapjoy/tJPlacementListener.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future main() async {
@@ -15,7 +15,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
   String _tapjoyStatus = 'Initializing';
   var active;
 
@@ -25,12 +24,10 @@ class _MyAppState extends State<MyApp> {
     initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     Tapjoy.setDebugEnabled(true);
     Tapjoy.connect(
       DotEnv().env['TAPJOY_KEY'],
-      // "pqRbeIEcSHqjTgpN3zuVEwECKLDGUq3y0sIKMQmqH5mv0SKukE4DO9cmG6f9",
       tapjoyConnectSuccess,
       () => setState(
         () {
@@ -38,10 +35,6 @@ class _MyAppState extends State<MyApp> {
         },
       ),
     );
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
   }
 
@@ -49,8 +42,6 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _tapjoyStatus = 'connected';
     });
-    // Tapjoy.isConnected();
-    // Tapjoy.getPlacement("mohamed", new TJPlacementListener());
   }
 
   @override
@@ -66,6 +57,11 @@ class _MyAppState extends State<MyApp> {
               child: Text('is Content Available'),
               onPressed: () => Tapjoy.isContentAvailable(),
             ),
+            RaisedButton(
+              child: Text('is Content Available'),
+              onPressed: () =>
+                  Tapjoy.getPlacement('mohamed', PlacementListener()),
+            ),
             Center(
               child: Text('Tapjay Status = $_tapjoyStatus'),
             ),
@@ -74,4 +70,36 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+}
+
+class PlacementListener implements TJPlacementListener {
+  @override
+  void onClick(TJPlacement tjPlacement) {
+    print('onClick');
+  }
+
+  @override
+  void onContentDismiss(TJPlacement tjPlacement) {
+    print('onContentDismiss');
+  }
+
+  @override
+  void onContentReady(TJPlacement tjPlacement) {}
+
+  @override
+  void onContentShow(TJPlacement tjPlacement) {}
+
+  @override
+  void onPurchaseRequest(TJPlacement tjPlacement,
+      TJActionRequest tjActionRequest, String productIds) {}
+
+  @override
+  void onRequestFailure(TJPlacement tjPlacement, TJError tjError) {}
+
+  @override
+  void onRequestSuccess(TJPlacement tjPlacement) {}
+
+  @override
+  void onRewardRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest,
+      String itemId, int quantity) {}
 }

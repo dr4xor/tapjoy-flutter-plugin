@@ -2,11 +2,12 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:tapjoy/models.dart';
 
-// old key
-// J6O0mKuBSUSUBk1mq7Ya2AEC2JOHMmmMKxjRCgJrmO9HLzE6xBMMFRF01aNM
-
 class Tapjoy {
   static const MethodChannel _channel = const MethodChannel('tapjoy');
+  static TJPlacementListener _listener;
+  static TJPlacementListener getListener() {
+    return _listener;
+  }
 
   static void connect(
       String tapjoyKey, Function connectSuccess, Function connectFail) {
@@ -34,12 +35,13 @@ class Tapjoy {
     return await _channel.invokeMethod('isConnected');
   }
 
-  static Future<TJPlacement> getPlacement(
+  static Future<Null> getPlacement(
       String placementName, TJPlacementListener listener) async {
     final result = await _channel.invokeMethod<Map<dynamic, dynamic>>(
         'getPlacement', {"placementName": placementName});
+    _listener = listener;
+    _channel.setMethodCallHandler(_listener._handle);
     final name = result['Name'] as String;
-    // return new TJPlacement(placementName);
   }
 
   static Future<bool> isContentAvailable() async {
@@ -63,12 +65,12 @@ class ActionRequest implements TJActionRequest {
   ActionRequest(this.call);
   @override
   String getToken() {
-    return call.arguments('');
+    return call.arguments('token');
   }
 
   @override
   String getRequestId() {
-    return call.arguments('');
+    return call.arguments('requestId');
   }
 
   @override
@@ -87,6 +89,7 @@ abstract class TJPlacementListener {
 //    TJPlacementListener
     if (call.method == 'onRequestSuccess') {
       onRequestSuccess(TJPlacement(listener: this));
+      print('onRequestSuccess');
     } else if (call.method == 'onRequestFailure') {
       onRequestFailure(
         TJPlacement(listener: this),
@@ -94,6 +97,7 @@ abstract class TJPlacementListener {
             errorCode: call.arguments('code'),
             errorMessage: call.arguments('message')),
       );
+      print('onRequestFailure');
     } else if (call.method == 'onContentReady') {
       onContentReady(TJPlacement(listener: this));
     } else if (call.method == 'onContentShow') {
@@ -101,9 +105,14 @@ abstract class TJPlacementListener {
     } else if (call.method == 'onContentDismiss') {
       onContentDismiss(TJPlacement(listener: this));
     } else if (call.method == 'onPurchaseRequest') {
-      onPurchaseRequest(TJPlacement(listener: this), ActionRequest(call), "");
+      String productId = call.arguments('productId');
+      onPurchaseRequest(
+          TJPlacement(listener: this), ActionRequest(call), productId);
     } else if (call.method == 'onRewardRequest') {
-      onRewardRequest(TJPlacement(listener: this), ActionRequest(call), "", 12);
+      String itemId = call.arguments('itemId');
+      int quantity = call.arguments('quantity');
+      onRewardRequest(
+          TJPlacement(listener: this), ActionRequest(call), itemId, quantity);
     } else if (call.method == 'onClick') {
       onClick(TJPlacement(listener: this));
     }
@@ -114,9 +123,9 @@ abstract class TJPlacementListener {
   void onContentReady(TJPlacement tjPlacement);
   void onContentShow(TJPlacement tjPlacement);
   void onContentDismiss(TJPlacement tjPlacement);
-  void onPurchaseRequest(
-      TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s);
+  void onPurchaseRequest(TJPlacement tjPlacement,
+      TJActionRequest tjActionRequest, String productIds);
   void onRewardRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest,
-      String s, int i);
+      String itemId, int quantity);
   void onClick(TJPlacement tjPlacement);
 }
