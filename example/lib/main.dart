@@ -55,12 +55,12 @@ class _MyAppState extends State<MyApp> {
           children: <Widget>[
             RaisedButton(
               child: Text('is Content Available'),
-              onPressed: () => Tapjoy.isContentAvailable(),
+              onPressed: () => TJPlacement('coinsscreen').isContentAvailable(),
             ),
             RaisedButton(
               child: Text('is Content Available'),
               onPressed: () =>
-                  Tapjoy.getPlacement('mohamed', PlacementListener()),
+                  Tapjoy.getPlacement('coinsscreen', PlacementListener()),
             ),
             Center(
               child: Text('Tapjay Status = $_tapjoyStatus'),

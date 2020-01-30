@@ -35,20 +35,12 @@ class Tapjoy {
     return await _channel.invokeMethod('isConnected');
   }
 
-  static Future<Null> getPlacement(
+  static Future<TJPlacement> getPlacement(
       String placementName, TJPlacementListener listener) async {
-    final result = await _channel.invokeMethod<Map<dynamic, dynamic>>(
-        'getPlacement', {"placementName": placementName});
-    _listener = listener;
-    _channel.setMethodCallHandler(_listener._handle);
-    final name = result['Name'] as String;
-  }
-
-  static Future<bool> isContentAvailable() async {
-    bool contentStatus = await _channel
-        .invokeMethod('isContentAvailable', {'placementName': 'mohamed'});
-    print('$contentStatus******************************************');
-    return contentStatus;
+    final result = await _channel
+        .invokeMethod('getPlacement', {"placementName": placementName});
+    
+    return new TJPlacement(placementName);
   }
 
   static void setUserID(String userID) async {
@@ -88,33 +80,33 @@ abstract class TJPlacementListener {
   Future<Null> _handle(MethodCall call) async {
 //    TJPlacementListener
     if (call.method == 'onRequestSuccess') {
-      onRequestSuccess(TJPlacement(listener: this));
+      onRequestSuccess(TJPlacement('', listener: this));
       print('onRequestSuccess');
     } else if (call.method == 'onRequestFailure') {
       onRequestFailure(
-        TJPlacement(listener: this),
+        TJPlacement('', listener: this),
         TJError(
             errorCode: call.arguments('code'),
             errorMessage: call.arguments('message')),
       );
       print('onRequestFailure');
     } else if (call.method == 'onContentReady') {
-      onContentReady(TJPlacement(listener: this));
+      onContentReady(TJPlacement('', listener: this));
     } else if (call.method == 'onContentShow') {
-      onContentShow(TJPlacement(listener: this));
+      onContentShow(TJPlacement('', listener: this));
     } else if (call.method == 'onContentDismiss') {
-      onContentDismiss(TJPlacement(listener: this));
+      onContentDismiss(TJPlacement('', listener: this));
     } else if (call.method == 'onPurchaseRequest') {
       String productId = call.arguments('productId');
       onPurchaseRequest(
-          TJPlacement(listener: this), ActionRequest(call), productId);
+          TJPlacement('', listener: this), ActionRequest(call), productId);
     } else if (call.method == 'onRewardRequest') {
       String itemId = call.arguments('itemId');
       int quantity = call.arguments('quantity');
-      onRewardRequest(
-          TJPlacement(listener: this), ActionRequest(call), itemId, quantity);
+      onRewardRequest(TJPlacement('', listener: this), ActionRequest(call),
+          itemId, quantity);
     } else if (call.method == 'onClick') {
-      onClick(TJPlacement(listener: this));
+      onClick(TJPlacement('', listener: this));
     }
   }
 

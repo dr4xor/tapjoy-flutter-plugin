@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -41,6 +42,9 @@ public class TapjoyPlugin implements MethodCallHandler, TJPlacementListener {
     public static void registerWith(Registrar registrar) {
         channel = new MethodChannel(registrar.messenger(), "tapjoy");
         channel.setMethodCallHandler(new TapjoyPlugin(registrar.activity()));
+
+        final MethodChannel placementChannel = new MethodChannel(registrar.messenger(), "tjPlacement");
+        placementChannel.setMethodCallHandler(new TJPlacementPlugin(registrar.activity(), placementChannel));
     }
 
     private TapjoyPlugin(Activity activity) {
@@ -79,15 +83,7 @@ public class TapjoyPlugin implements MethodCallHandler, TJPlacementListener {
         } else if (call.method.equals("getPlacement")) {
             String placementName = call.argument("placementName");
             TJPlacement placement = Tapjoy.getPlacement(placementName, placementListener);
-            Map<String, String> mapRef = new HashMap<>();
-            mapRef.put("Name", placement.getName());
-            result.success(mapRef);
-        } else if (call.method.equals("isContentAvailable")) {
-            String placementName = call.argument("placementName");
-            TJPlacement placement = Tapjoy.getPlacement(placementName, placementListener);
-            boolean contentStatus = placement.isContentAvailable();
-            Log.e("mohamed", String.valueOf(contentStatus));
-            result.success(contentStatus);
+            placements.put(placement.getName(), placement);
         } else if (call.method.equals("setUserID")) {
             String userID = call.argument("userID");
             Tapjoy.setUserID(userID);
