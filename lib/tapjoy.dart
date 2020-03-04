@@ -171,4 +171,60 @@ class Tapjoy {
   static void setUserLevel(int userLevel) async {
     await _channel.invokeMethod('setUserLevel', {'userLevel': userLevel});
   }
+
+  static Future<bool> limitedConnect(String sdkKey) async {
+    bool limitedConnect =
+        await _channel.invokeMethod('limitedConnect', {'sdkKey': sdkKey});
+    return limitedConnect;
+  }
+
+  static void getCurrencyBalance() async {
+    await _channel.invokeMethod('getCurrencyBalance');
+    _channel.setMethodCallHandler((MethodCall methodCall) {
+      switch (methodCall.method) {
+        case 'onGetCurrencyBalanceResponse':
+          // do something
+          break;
+        case 'onGetCurrencyBalanceResponseFailure':
+          // do something
+          break;
+        default:
+      }
+      return;
+    });
+  }
+
+  static void awardCurrency(int amount) async {
+    await _channel.invokeMethod('awardCurrency', {'amount': amount});
+    _channel.setMethodCallHandler((MethodCall methodCall) {
+      switch (methodCall.method) {
+        case 'onAwardCurrencyResponse':
+          break;
+        case 'onAwardCurrencyResponseFailure':
+          break;
+        default:
+      }
+      return;
+    });
+  }
+
+  static Future<TJPlacement> getLimitedPlacement(String placementName) async {
+    TJPlacement placement = await _channel
+        .invokeMethod('getLimitedPlacement', {'placementName': placementName});
+    return placement;
+    // remain implement callback.
+  }
+
+  static void setEarnedCurrencyListener() async {
+    await _channel.invokeMethod('setEarnedCurrencyListener');
+    _channel.setMethodCallHandler((methodCall) {
+      // do something
+      return;
+    });
+  }
+
+  static void setReceiveRemoteNotification(Map remoteMessage) async {
+    await _channel.invokeMethod(
+        'setReceiveRemoteNotification', {'remoteMessage': remoteMessage});
+  }
 }

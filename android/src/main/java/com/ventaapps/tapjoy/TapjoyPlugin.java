@@ -9,9 +9,15 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
+import com.tapjoy.TJActionRequest;
+import com.tapjoy.TJAwardCurrencyListener;
 import com.tapjoy.TJConnectListener;
 
+import com.tapjoy.TJEarnedCurrencyListener;
+import com.tapjoy.TJError;
+import com.tapjoy.TJGetCurrencyBalanceListener;
 import com.tapjoy.TJPlacement;
+import com.tapjoy.TJPlacementListener;
 import com.tapjoy.Tapjoy;
 
 import java.util.HashMap;
@@ -138,6 +144,122 @@ public class TapjoyPlugin implements MethodCallHandler {
         } else if (call.method.equals("setUserLevel")) {
             int userLevel = call.argument("userLevel");
             Tapjoy.setUserLevel(userLevel);
+        } else if (call.method.equals("limitedConnect")) {
+            String sdkKey = call.argument("sdkKey");
+            Tapjoy.limitedConnect(activity.getApplicationContext(), sdkKey, new TJConnectListener() {
+                @Override
+                public void onConnectSuccess() {
+
+                }
+
+                @Override
+                public void onConnectFailure() {
+
+                }
+            });
+        } else if (call.method.equals("getCurrencyBalance")) {
+            Tapjoy.getCurrencyBalance(new TJGetCurrencyBalanceListener() {
+                @Override
+                public void onGetCurrencyBalanceResponse(String s, int i) {
+                    registrar.activity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            channel.invokeMethod("onGetCurrencyBalanceResponse", null);
+                        }
+                    });
+                }
+
+                @Override
+                public void onGetCurrencyBalanceResponseFailure(String s) {
+                    registrar.activity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            channel.invokeMethod("onGetCurrencyBalanceResponseFailure", null);
+                        }
+                    });
+                }
+            });
+        } else if (call.method.equals("awardCurrency")) {
+            int amount = call.argument("amount");
+            Tapjoy.awardCurrency(amount, new TJAwardCurrencyListener() {
+                @Override
+                public void onAwardCurrencyResponse(String s, int i) {
+                    registrar.activity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            channel.invokeMethod("onAwardCurrencyResponse", null);
+                        }
+                    });
+                }
+
+                @Override
+                public void onAwardCurrencyResponseFailure(String s) {
+                    registrar.activity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            channel.invokeMethod("onAwardCurrencyResponseFailure", null);
+                        }
+                    });
+                }
+            });
+        } else if (call.method.equals("getLimitedPlacement")) {
+            String placementName = call.argument("placementName");
+            Tapjoy.getLimitedPlacement(placementName, new TJPlacementListener() {
+                @Override
+                public void onRequestSuccess(TJPlacement tjPlacement) {
+
+                }
+
+                @Override
+                public void onRequestFailure(TJPlacement tjPlacement, TJError tjError) {
+
+                }
+
+                @Override
+                public void onContentReady(TJPlacement tjPlacement) {
+
+                }
+
+                @Override
+                public void onContentShow(TJPlacement tjPlacement) {
+
+                }
+
+                @Override
+                public void onContentDismiss(TJPlacement tjPlacement) {
+
+                }
+
+                @Override
+                public void onPurchaseRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s) {
+
+                }
+
+                @Override
+                public void onRewardRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest, String s, int i) {
+
+                }
+
+                @Override
+                public void onClick(TJPlacement tjPlacement) {
+
+                }
+            });
+        } else if (call.method.equals("setEarnedCurrencyListener")) {
+            Tapjoy.setEarnedCurrencyListener(new TJEarnedCurrencyListener() {
+                @Override
+                public void onEarnedCurrency(String s, int i) {
+                    registrar.activity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            channel.invokeMethod("onEarnedCurrency", null);
+                        }
+                    });
+                }
+            });
+        } else if (call.method.equals("setReceiveRemoteNotification")) {      // check for map argument.
+            Map remoteMessage = call.argument("remoteMessage");
+            Tapjoy.setReceiveRemoteNotification(activity.getApplicationContext(),remoteMessage);
         } else {
             result.notImplemented();
         }

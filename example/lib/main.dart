@@ -59,7 +59,6 @@ class _MyAppState extends State<MyApp> {
               onPressed: () async {
                 TJPlacement tjPlacement = await Tapjoy.getPlacement('mohamed',
                     onRequestSuccess: (placement) => placement.showContent(),
-                    // onContentReady: (placement) => placement.showContent(),
                     onRequestFailure: (placement, error) => print(
                         error.errorCode.toString() +
                             ' - ' +
