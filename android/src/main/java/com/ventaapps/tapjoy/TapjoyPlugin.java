@@ -64,7 +64,6 @@ public class TapjoyPlugin implements MethodCallHandler {
                     channel.invokeMethod("connect", "fail");
                 }
             }));
-//            Tapjoy.setActivity(this.activity);
         } else if (call.method.equals("getPlacement")) {
             String placementName = call.argument("placementName");
             TJPlacement placement = Tapjoy.getPlacement(placementName, new TJPlacementListenerPlugin(this.registrar, placementName));
@@ -78,6 +77,67 @@ public class TapjoyPlugin implements MethodCallHandler {
             String senderID = call.argument("senderID");
             Tapjoy.setGcmSender(senderID);
             result.success(null);
+        } else if (call.method.equals("actionComplete")) {
+            String actionID = call.argument("actionID");
+            Tapjoy.actionComplete(actionID);
+        } else if (call.method.equals("addUserTag")) {
+            String tag = call.argument("tag");
+            Tapjoy.addUserTag(tag);
+        } else if (call.method.equals("belowConsentAge")) {
+            boolean isBelowConsentAge = call.argument("isBelowConsentAge");
+            Tapjoy.belowConsentAge(isBelowConsentAge);
+        } else if (call.method.equals("clearUserTags")) {
+            Tapjoy.clearUserTags();
+        } else if (call.method.equals("endSession")) {
+            Tapjoy.endSession();
+        } else if (call.method.equals("getSupportURL")) {
+            String supportURL = call.argument("supportURL");
+            if (supportURL == null) {
+                result.success(Tapjoy.getSupportURL());
+            } else {
+                result.success(Tapjoy.getSupportURL(supportURL));
+            }
+        } else if (call.method.equals("getUserToken")) {
+            result.success(Tapjoy.getUserToken());
+        } else if (call.method.equals("isLimitedConnected")) {
+            result.success(Tapjoy.isLimitedConnected());
+        } else if (call.method.equals("isPushNotificationDisabled")) {
+            result.success(Tapjoy.isPushNotificationDisabled());
+        } else if (call.method.equals("loadSharedLibrary")) {
+            Tapjoy.loadSharedLibrary();
+        } else if (call.method.equals("onActivityStart")) {
+            Tapjoy.onActivityStart(this.activity);
+        } else if (call.method.equals("onActivityStop")) {
+            Tapjoy.onActivityStop(this.activity);
+        } else if (call.method.equals("removeUserTag")) {
+            String userTag = call.argument("userTag");
+            Tapjoy.removeUserTag(userTag);
+        } else if (call.method.equals("setAppDataVersion")) {
+            String dataVersion = call.argument("dataVersion");
+            Tapjoy.setAppDataVersion(dataVersion);
+        } else if (call.method.equals("getVersion")) {
+            result.success(Tapjoy.getVersion());
+        } else if (call.method.equals("setDeviceToken")) {
+            String deviceToken = call.argument("deviceToken");
+            Tapjoy.setDeviceToken(deviceToken);
+        } else if (call.method.equals("setPushNotificationDisabled")) {
+            boolean disable = call.argument("disable");
+            Tapjoy.setPushNotificationDisabled(disable);
+        } else if (call.method.equals("setUserConsent")) {
+            String consent = call.argument("consent");
+            Tapjoy.setUserConsent(consent);
+        } else if (call.method.equals("setUserCohortVariable")) {
+            int cohortIndex = call.argument("cohortIndex");
+            String cohortValue = call.argument("cohortValue");
+            Tapjoy.setUserCohortVariable(cohortIndex, cohortValue);
+        } else if (call.method.equals("subjectToGDPR")) {
+            boolean gdprApplicable = call.argument("gdprApplicable");
+            Tapjoy.subjectToGDPR(gdprApplicable);
+        } else if (call.method.equals("startSession")) {
+            Tapjoy.startSession();
+        } else if (call.method.equals("setUserLevel")) {
+            int userLevel = call.argument("userLevel");
+            Tapjoy.setUserLevel(userLevel);
         } else {
             result.notImplemented();
         }

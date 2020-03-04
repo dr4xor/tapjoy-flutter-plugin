@@ -72,16 +72,13 @@ class TJPlacement {
   }
 
   Future<bool> isContentReady() async {
-    bool contentStatus = await _channel
-        .invokeMethod('isContentReady', {'placementName': this.placementName});
+    bool contentStatus = await _channel.invokeMethod('isContentReady');
     return contentStatus;
   }
 
   Future<void> requestContent() async {
     if (await Tapjoy.isConnected()) {
-      void contentStatus = await _channel.invokeMethod(
-          'requestContent', {'placementName': this.placementName});
-      return contentStatus;
+      void content = await _channel.invokeMethod('requestContent');
     } else {
       print('content not ready');
     }
@@ -89,12 +86,39 @@ class TJPlacement {
 
   Future<void> showContent() async {
     if (await this.isContentAvailable() || await this.isContentReady()) {
-      void contentStatus = await _channel
-          .invokeMethod('showContent', {'placementName': this.placementName});
-      return contentStatus;
+      void content = await _channel.invokeMethod('showContent');
     } else {
       print('no content to show, or it has not yet downloaded');
     }
+  }
+
+  Future<void> setMediationName(String mediationName) async {
+    final mediaName = await _channel.invokeMethod('setMediationName');
+  }
+
+  Future<void> setMediationId(String mediationId) async {
+    final mediaId = await _channel
+        .invokeMethod('setMediationId', {'mediationId': mediationId});
+  }
+
+  Future<void> setAdapterVersion(String adapterVersion) async {
+    final adaptVersion = await _channel
+        .invokeMethod('setAdapterVersion', {'adapterVersion': adapterVersion});
+  }
+
+  Future<bool> isLimited() async {
+    bool isLimited = await _channel.invokeMethod('isLimited');
+    return isLimited;
+  }
+
+  Future<String> getName() async {
+    String name = await _channel.invokeMethod('getName');
+    return name;
+  }
+
+  Future<String> getGUID() async {
+    String guid = await _channel.invokeMethod('getGUID');
+    return guid;
   }
 }
 

@@ -34,25 +34,35 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
     public void onMethodCall(MethodCall call, MethodChannel.Result result) {
 
 //        tjPlacement.pushId;
-//        tjPlacement.setAdapterVersion();
-//        tjPlacement.getGUID();
-//        tjPlacement.isLimited();
 //        tjPlacement.setAuctionData();
-//        tjPlacement.setMediationId();
-//        tjPlacement.setMediationName();
 //        tjPlacement.getListener();
 //        tjPlacement.getVideoListener();
 
         if (TapjoyPlugin.placements.containsKey(this.placementName)) {
             TJPlacement placement = TapjoyPlugin.placements.get(placementName);
             if (call.method.equals("isContentReady")) {
-                    result.success(placement.isContentReady());
+                result.success(placement.isContentReady());
             } else if (call.method.equals("isContentAvailable")) {
                 result.success(placement.isContentAvailable());
             } else if (call.method.equals("requestContent")) {
                 placement.requestContent();
             } else if (call.method.equals("showContent")) {
                 placement.showContent();
+            } else if (call.method.equals("setMediationName")) {
+                String mediationName = call.argument("mediationName");
+                placement.setMediationName(mediationName);
+            } else if (call.method.equals("setMediationId")) {
+                String mediationId = call.argument("mediationId");
+                placement.setMediationId(mediationId);
+            } else if (call.method.equals("setAdapterVersion")) {
+                String adapterVersion = call.argument("adapterVersion");
+                placement.setAdapterVersion(adapterVersion);
+            } else if (call.method.equals("isLimited")) {
+                result.success(placement.isLimited());
+            } else if (call.method.equals("getName")) {
+                result.success(placement.getName());
+            } else if (call.method.equals("getGUID")) {
+                result.success(placement.getGUID());
             } else {
                 result.notImplemented();
             }
