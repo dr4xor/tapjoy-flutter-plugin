@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tapjoy/models.dart';
 import 'dart:async';
 import 'package:tapjoy/tapjoy.dart';
+import 'package:tapjoy/tj_placement.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future main() async {
@@ -39,6 +39,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   void tapjoyConnectSuccess() {
+    Tapjoy.setActivity();
     setState(() {
       _tapjoyStatus = 'connected';
     });
@@ -55,12 +56,17 @@ class _MyAppState extends State<MyApp> {
           children: <Widget>[
             RaisedButton(
               child: Text('is Content Available'),
-              onPressed: () => TJPlacement('coinsscreen').isContentAvailable(),
-            ),
-            RaisedButton(
-              child: Text('is Content Available'),
-              onPressed: () =>
-                  Tapjoy.getPlacement('coinsscreen', PlacementListener()),
+              onPressed: () async {
+                TJPlacement tjPlacement = await Tapjoy.getPlacement(
+                    'mohamed',
+                    onRequestSuccess: (placement) => placement.showContent(),
+                    // onContentReady: (placement) => placement.showContent(),
+                    onRequestFailure: (placement, error) => print(
+                        error.errorCode.toString() +
+                            ' - ' +
+                            error.errorMessage));
+                tjPlacement.requestContent();
+              },
             ),
             Center(
               child: Text('Tapjay Status = $_tapjoyStatus'),
@@ -70,36 +76,4 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-}
-
-class PlacementListener implements TJPlacementListener {
-  @override
-  void onClick(TJPlacement tjPlacement) {
-    print('onClick');
-  }
-
-  @override
-  void onContentDismiss(TJPlacement tjPlacement) {
-    print('onContentDismiss');
-  }
-
-  @override
-  void onContentReady(TJPlacement tjPlacement) {}
-
-  @override
-  void onContentShow(TJPlacement tjPlacement) {}
-
-  @override
-  void onPurchaseRequest(TJPlacement tjPlacement,
-      TJActionRequest tjActionRequest, String productIds) {}
-
-  @override
-  void onRequestFailure(TJPlacement tjPlacement, TJError tjError) {}
-
-  @override
-  void onRequestSuccess(TJPlacement tjPlacement) {}
-
-  @override
-  void onRewardRequest(TJPlacement tjPlacement, TJActionRequest tjActionRequest,
-      String itemId, int quantity) {}
 }

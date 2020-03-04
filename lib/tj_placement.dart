@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
 import './tapjoy.dart';
+import './tj_actionRequest.dart';
+import './tj_error.dart';
 
 typedef void OnRequestSuccess(TJPlacement tjPlacement);
 typedef void OnRequestFailure(TJPlacement tjPlacement, TJError tjError);
@@ -65,8 +67,7 @@ class TJPlacement {
   }
 
   Future<bool> isContentAvailable() async {
-    bool contentStatus = await _channel.invokeMethod(
-        'isContentAvailable');
+    bool contentStatus = await _channel.invokeMethod('isContentAvailable');
     return contentStatus;
   }
 
@@ -95,20 +96,6 @@ class TJPlacement {
       print('no content to show, or it has not yet downloaded');
     }
   }
-}
-
-class TJError {
-  final int errorCode;
-  final String errorMessage;
-  TJError({this.errorCode, this.errorMessage});
-}
-
-abstract class TJActionRequest {
-  String getRequestId();
-  String getToken();
-  void completed();
-  void cancelled();
-  TJActionRequest({getRequestId(), getToken(), completed(), cancelled()});
 }
 
 class ActionRequest implements TJActionRequest {
