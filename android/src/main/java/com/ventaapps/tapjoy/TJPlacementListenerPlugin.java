@@ -7,6 +7,8 @@ import com.tapjoy.TJConnectListener;
 import com.tapjoy.TJError;
 import com.tapjoy.TJPlacement;
 import com.tapjoy.TJPlacementListener;
+import com.tapjoy.TJPlacementVideoListener;
+import com.tapjoy.Tapjoy;
 
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 
@@ -63,6 +65,38 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
                 result.success(placement.getName());
             } else if (call.method.equals("getGUID")) {
                 result.success(placement.getGUID());
+            } else if (call.method.equals("setVideoListener")) {
+                placement.setVideoListener(new TJPlacementVideoListener() {
+                    @Override
+                    public void onVideoStart(TJPlacement tjPlacement) {
+                        registrar.activity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                channel.invokeMethod("onVideoStart", null);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onVideoError(TJPlacement tjPlacement, String s) {
+                        registrar.activity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                channel.invokeMethod("onVideoError", null);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onVideoComplete(TJPlacement tjPlacement) {
+                        registrar.activity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                channel.invokeMethod("onVideoComplete", null);
+                            }
+                        });
+                    }
+                });
             } else {
                 result.notImplemented();
             }

@@ -149,12 +149,22 @@ public class TapjoyPlugin implements MethodCallHandler {
             Tapjoy.limitedConnect(activity.getApplicationContext(), sdkKey, new TJConnectListener() {
                 @Override
                 public void onConnectSuccess() {
-
+                    registrar.activity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            channel.invokeMethod("onLimitedConnectSuccess", null);
+                        }
+                    });
                 }
 
                 @Override
                 public void onConnectFailure() {
-
+                    registrar.activity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            channel.invokeMethod("onLimitedConnectFailure", null);
+                        }
+                    });
                 }
             });
         } else if (call.method.equals("getCurrencyBalance")) {
@@ -259,7 +269,7 @@ public class TapjoyPlugin implements MethodCallHandler {
             });
         } else if (call.method.equals("setReceiveRemoteNotification")) {      // check for map argument.
             Map remoteMessage = call.argument("remoteMessage");
-            Tapjoy.setReceiveRemoteNotification(activity.getApplicationContext(),remoteMessage);
+            Tapjoy.setReceiveRemoteNotification(activity.getApplicationContext(), remoteMessage);
         } else {
             result.notImplemented();
         }

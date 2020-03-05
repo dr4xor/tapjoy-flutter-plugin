@@ -5,16 +5,55 @@ import 'package:tapjoy/tj_placement.dart';
 class Tapjoy {
   static const MethodChannel _channel = const MethodChannel('tapjoy');
 
+  static Function connectSuccess;
+  static Function connectFail;
+  static Function onLimitedConnectSuccess;
+  static Function onLimitedConnectFailure;
+  static Function onGetCurrencyBalanceResponse;
+  static Function onGetCurrencyBalanceResponseFailure;
+  static Function onAwardCurrencyResponse;
+  static Function onAwardCurrencyResponseFailure;
+  static Function onEarnedCurrency;
+
   static void connect(
-      String tapjoyKey, Function connectSuccess, Function connectFail) {
+      String tapjoyKey, Function connectSuccessFunc, Function connectFailFunc) {
+    connectSuccess = connectSuccessFunc;
+    connectFail = connectFailFunc;
+
     _channel.setMethodCallHandler((MethodCall methodCall) {
       switch (methodCall.method) {
         case 'connect':
           if (methodCall.arguments == "success") {
-            connectSuccess();
+            if (connectSuccess != null) connectSuccess();
           } else {
-            connectFail();
+            if (connectFail != null) connectFail();
           }
+          break;
+        case 'onLimitedConnectSuccess':
+          if (onLimitedConnectSuccess != null) onLimitedConnectSuccess();
+
+          break;
+        case 'onLimitedConnectFailure':
+          if (onLimitedConnectFailure != null) onLimitedConnectFailure();
+
+          break;
+        case 'onGetCurrencyBalanceResponse':
+          if (onGetCurrencyBalanceResponse != null)
+            onGetCurrencyBalanceResponse();
+          break;
+        case 'onGetCurrencyBalanceResponseFailure':
+          if (onGetCurrencyBalanceResponseFailure != null)
+            onGetCurrencyBalanceResponseFailure();
+          break;
+        case 'onAwardCurrencyResponse':
+          if (onAwardCurrencyResponse != null) onAwardCurrencyResponse();
+          break;
+        case 'onAwardCurrencyResponseFailure':
+          if (onAwardCurrencyResponseFailure != null)
+            onAwardCurrencyResponseFailure();
+          break;
+        case 'onEarnedCurrency':
+          if (onEarnedCurrency != null) onEarnedCurrency();
           break;
         default:
       }
@@ -172,40 +211,32 @@ class Tapjoy {
     await _channel.invokeMethod('setUserLevel', {'userLevel': userLevel});
   }
 
-  static Future<bool> limitedConnect(String sdkKey) async {
+  static Future<bool> limitedConnect(String sdkKey,
+      {Function onLimitedConnectSuccessFunc,
+      Function onLimitedConnectFailureFunc}) async {
+    // note return type.
+    onLimitedConnectSuccess = onLimitedConnectSuccessFunc;
+    onLimitedConnectFailure = onLimitedConnectFailureFunc;
     bool limitedConnect =
         await _channel.invokeMethod('limitedConnect', {'sdkKey': sdkKey});
     return limitedConnect;
   }
 
-  static void getCurrencyBalance() async {
+  static void getCurrencyBalance(
+      {Function onGetCurrencyBalanceResponseFunc,
+      Function onGetCurrencyBalanceResponseFailureFunc}) async {
+    onGetCurrencyBalanceResponse = onGetCurrencyBalanceResponseFunc;
+    onGetCurrencyBalanceResponseFailure =
+        onGetCurrencyBalanceResponseFailureFunc;
     await _channel.invokeMethod('getCurrencyBalance');
-    _channel.setMethodCallHandler((MethodCall methodCall) {
-      switch (methodCall.method) {
-        case 'onGetCurrencyBalanceResponse':
-          // do something
-          break;
-        case 'onGetCurrencyBalanceResponseFailure':
-          // do something
-          break;
-        default:
-      }
-      return;
-    });
   }
 
-  static void awardCurrency(int amount) async {
+  static void awardCurrency(int amount,
+      {Function onAwardCurrencyResponseFunc,
+      Function onAwardCurrencyResponseFailureFunc}) async {
+    onAwardCurrencyResponse = onAwardCurrencyResponseFunc;
+    onAwardCurrencyResponseFailure = onAwardCurrencyResponseFailureFunc;
     await _channel.invokeMethod('awardCurrency', {'amount': amount});
-    _channel.setMethodCallHandler((MethodCall methodCall) {
-      switch (methodCall.method) {
-        case 'onAwardCurrencyResponse':
-          break;
-        case 'onAwardCurrencyResponseFailure':
-          break;
-        default:
-      }
-      return;
-    });
   }
 
   static Future<TJPlacement> getLimitedPlacement(String placementName) async {
@@ -215,12 +246,9 @@ class Tapjoy {
     // remain implement callback.
   }
 
-  static void setEarnedCurrencyListener() async {
+  static void setEarnedCurrencyListener({Function onEarnedCurrencyFunc}) async {
+    onEarnedCurrency = onEarnedCurrencyFunc;
     await _channel.invokeMethod('setEarnedCurrencyListener');
-    _channel.setMethodCallHandler((methodCall) {
-      // do something
-      return;
-    });
   }
 
   static void setReceiveRemoteNotification(Map remoteMessage) async {

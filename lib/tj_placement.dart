@@ -86,7 +86,7 @@ class TJPlacement {
 
   Future<void> showContent() async {
     if (await this.isContentAvailable() || await this.isContentReady()) {
-      void content = await _channel.invokeMethod('showContent');
+      final content = await _channel.invokeMethod('showContent');
     } else {
       print('no content to show, or it has not yet downloaded');
     }
@@ -119,6 +119,28 @@ class TJPlacement {
   Future<String> getGUID() async {
     String guid = await _channel.invokeMethod('getGUID');
     return guid;
+  }
+
+  Future<void> setVideoListener(
+      {Function onVideoStart,
+      Function onVideoError,
+      Function onVideoComplete}) async {
+    await _channel.invokeMethod('setVideoListener');
+    _channel.setMethodCallHandler((methodCall) {
+      switch (methodCall.method) {
+        case 'onVideoStart':
+          onVideoStart();
+          break;
+        case 'onVideoError':
+          onVideoError();
+          break;
+        case 'onVideoComplete':
+          onVideoComplete();
+          break;
+        default:
+      }
+      return;
+    });
   }
 }
 
