@@ -142,6 +142,20 @@ class TJPlacement {
       return;
     });
   }
+
+  // This Functions Not Implementted Uptil Now.
+
+  Future<void> setAuctionData() async {
+    throw UnsupportedError('This Function Not Implementted Uptil Now!');
+  }
+
+  Future<void> getListener() async {
+    throw UnsupportedError('This Function Not Implementted Uptil Now!');
+  }
+
+  Future<void> getVideoListener() async {
+    throw UnsupportedError('This Function Not Implementted Uptil Now!');
+  }
 }
 
 class ActionRequest implements TJActionRequest {

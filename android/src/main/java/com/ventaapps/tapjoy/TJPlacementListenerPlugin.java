@@ -35,7 +35,6 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
     @Override
     public void onMethodCall(MethodCall call, MethodChannel.Result result) {
 
-//        tjPlacement.pushId;
 //        tjPlacement.setAuctionData();
 //        tjPlacement.getListener();
 //        tjPlacement.getVideoListener();

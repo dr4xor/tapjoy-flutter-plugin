@@ -23,6 +23,7 @@ import com.tapjoy.Tapjoy;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class TapjoyPlugin implements MethodCallHandler {
@@ -270,6 +271,41 @@ public class TapjoyPlugin implements MethodCallHandler {
         } else if (call.method.equals("setReceiveRemoteNotification")) {      // check for map argument.
             Map remoteMessage = call.argument("remoteMessage");
             Tapjoy.setReceiveRemoteNotification(activity.getApplicationContext(), remoteMessage);
+        } else if (call.method.equals("trackEvent")) {
+            String name = call.argument("name");
+            Long value = call.argument("value");
+            String category = call.argument("category");
+            String parameter1 = call.argument("parameter1");
+            String parameter2 = call.argument("parameter2");
+            Map values = call.argument("values");
+
+            if (value == null && category == null && parameter1 == null && parameter2 == null && values == null) {
+                Tapjoy.trackEvent(name);
+            } else if (category == null && parameter1 == null && parameter2 == null && values == null) {
+                Tapjoy.trackEvent(name, value);
+            } else if (parameter1 == null && parameter2 == null && values == null) {
+                Tapjoy.trackEvent(category, name, value);
+            } else if (value == null && values == null) {
+                Tapjoy.trackEvent(category, name, parameter1, parameter2);
+            } else if (values == null) {
+                Tapjoy.trackEvent(category, name, parameter1, parameter2, value);
+            } else if (value == null) {
+                Tapjoy.trackEvent(category, name, parameter1, parameter2, values);
+            } else {
+                result.success("You Must Pass Compatible Arguments!");
+            }
+        } else if (call.method.equals("trackPurchaseById")) {
+            String productId = call.argument("productId");
+            String currencyCode = call.argument("currencyCode");
+            double price = call.argument("price");
+            String campaignId = call.argument("campaignId");
+            Tapjoy.trackPurchase(productId, currencyCode, price, campaignId);
+        } else if (call.method.equals("trackPurchaseByData")) {
+            String skuDetails = call.argument("skuDetails");
+            String purchaseData = call.argument("purchaseData");
+            String dataSignature = call.argument("dataSignature");
+            String campaignId = call.argument("campaignId");
+            Tapjoy.trackPurchase(skuDetails, purchaseData, dataSignature, campaignId);
         } else {
             result.notImplemented();
         }

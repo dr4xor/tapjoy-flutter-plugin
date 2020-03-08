@@ -255,4 +255,44 @@ class Tapjoy {
     await _channel.invokeMethod(
         'setReceiveRemoteNotification', {'remoteMessage': remoteMessage});
   }
+
+  static void trackEvent(String name,
+      {int value,
+      String category,
+      String parameter1,
+      String parameter2,
+      Map values}) async {
+    await _channel.invokeMethod('trackEvent', {
+      'category': category,
+      'name': name,
+      'parameter1': parameter1,
+      'parameter2': parameter2,
+      'value': value,
+      'values': values
+    });
+  }
+
+  Future<void> trackPurchaseById(String productId, String currencyCode,
+      double price, String campaignId) async {
+    await _channel.invokeMethod('trackPurchaseById', {
+      'productId': productId,
+      'currencyCode': currencyCode,
+      'price': price,
+      'campaignId': campaignId
+    });
+  }
+
+  Future<void> trackPurchaseByData(String skuDetails, String purchaseData,
+      String dataSignature, String campaignId) async {
+    await _channel.invokeMethod('trackPurchaseByData', {
+      'skuDetails': skuDetails,
+      'purchaseData': purchaseData,
+      'dataSignature': dataSignature,
+      'campaignId': campaignId
+    });
+  }
+
+  Future<void> setUserTags() async {
+    throw UnimplementedError('This Function Not Implemented Uptil Now');
+  }
 }
