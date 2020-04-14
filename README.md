@@ -24,7 +24,7 @@ Replace `tapjoy_key` with your actual Tapjoy key.
   
  2. Initialise tapjoyConnectSuccess callback
  
- `void tapjoyConnectSuccess() {
+ `void tapjoyConnectSuccess()` `{
     Tapjoy.setActivity();
     Tapjoy.setUserConsent('1'); //'1' indicates that you have taken the consent of your user.
     setState(() {
