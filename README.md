@@ -52,5 +52,5 @@ Future<void> initPlatformState() async {
   For the complete implementation, please refer to the example repo.        
   You can refer to the Tapjoy SDK Documentation for any features you want to implement in Dart.
   
- #### Future Work
-  #### Implement for iOS Platform.
+ ### Future Work
+ Implement for iOS Platform.
