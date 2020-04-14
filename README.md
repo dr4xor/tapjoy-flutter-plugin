@@ -1,9 +1,9 @@
 # **Tapjoy Plugin for Flutter**
 
-## This is a dependency to use Tapjoy in your Flutter apps. 
-## Note: Currently this only works for Android and we are looking for people who will help us with the iOS version. 
 
-Getting started:
+#### Note: Currently this only works for Android and we are looking for people who will help us with the iOS version. 
+
+## Getting started:
 ### 1. Initialise Tapjoy 
 Call `initPlatformState()` during app initialization
 Replace `tapjoy_key` with your actual Tapjoy key.
