@@ -2,7 +2,6 @@
 
 
 #### Note: Currently this only works for Android and we are looking for people who will help us with the iOS version.
-#### Note: This is a forked repo from VentaApps
 
 ## Getting started:
 ### 1. Initialise Tapjoy 
