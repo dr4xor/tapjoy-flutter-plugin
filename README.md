@@ -8,18 +8,18 @@ Getting started:
 Call `initPlatformState()` during app initialization
 Replace `tapjoy_key` with your actual Tapjoy key.
 
- `Future<void> initPlatformState() async {
-    Tapjoy.setDebugEnabled(true);  //Make this true only for testing
-    Tapjoy.connect(
-      'tapjoy_key',
-      tapjoyConnectSuccess,
-      () => setState(
-        () {
-          _tapjoyStatus = 'failed';
-        },
-      ),
-    );
-    if (!mounted) return;
+ `Future<void> initPlatformState() async {/
+    Tapjoy.setDebugEnabled(true);  //Make this true only for testing/
+    Tapjoy.connect(/
+      'tapjoy_key',/
+      tapjoyConnectSuccess,/
+      () => setState(/
+        () {/
+          _tapjoyStatus = 'failed';/
+        },/
+      ),/
+    );/
+    if (!mounted) return;/
   }`
   
  2. Initialise tapjoyConnectSuccess callback
