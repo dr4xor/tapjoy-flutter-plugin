@@ -23,6 +23,7 @@ Replace `tapjoy_key` with your actual Tapjoy key.
   }`
   
  2. Initialise tapjoyConnectSuccess callback
+ 
  `void tapjoyConnectSuccess() {
     Tapjoy.setActivity();
     Tapjoy.setUserConsent('1'); //'1' indicates that you have taken the consent of your user.
@@ -33,6 +34,7 @@ Replace `tapjoy_key` with your actual Tapjoy key.
   
   3. Call TJPlacement 
   Replace `placement_name` with your Tapjoy placement. 
+  
   `TJPlacement tjPlacement = await Tapjoy.getPlacement('placement_name',
                     onRequestSuccess: (placement) => placement.showContent(),
                     onRequestFailure: (placement, error) => print(
