@@ -1,7 +1,13 @@
 package com.ventaapps.tapjoy;
 
 import android.app.Activity;
+import android.content.Context;
 
+import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -26,21 +32,72 @@ import java.util.Map;
 import java.util.Objects;
 
 
-public class TapjoyPlugin implements MethodCallHandler {
+public class TapjoyPlugin implements FlutterPlugin, ActivityAware, MethodCallHandler {
 
     static MethodChannel channel;
     static private Registrar registrar;
     static Map<String, TJPlacement> placements = new HashMap<>();
-    private final Activity activity;
+    private Activity activity;
+    private Context applicationContext;
+    private BinaryMessenger messenger;
+    private FlutterPluginBinding pluginBinding;
 
     public static void registerWith(Registrar registrar) {
+        if (registrar.activity() == null) {
+            // If a background Flutter view tries to register the plugin, there will be no activity from the registrar.
+            // We stop the registering process immediately because Tapjoy requires an activity.
+            return;
+        }
+
+        final TapjoyPlugin plugin = new TapjoyPlugin();
+        registrar.publish(plugin);
         TapjoyPlugin.registrar = registrar;
-        channel = new MethodChannel(registrar.messenger(), "tapjoy");
-        channel.setMethodCallHandler(new TapjoyPlugin(registrar.activity()));
+        plugin.initializePlugin(registrar.context(), registrar.activity(), registrar.messenger());
     }
 
-    private TapjoyPlugin(Activity activity) {
+    private void initializePlugin(Context applicationContext, Activity activity, BinaryMessenger messenger) {
         this.activity = activity;
+        this.applicationContext = applicationContext;
+        this.messenger = messenger;
+
+        this.channel = new MethodChannel(messenger, "tapjoy");
+        channel.setMethodCallHandler(this);
+    }
+
+    @Override
+    public void onAttachedToEngine(FlutterPluginBinding binding) {
+        pluginBinding = binding;
+    }
+
+    @Override
+    public void onDetachedFromEngine(FlutterPluginBinding binding) {
+        pluginBinding = null;
+    }
+
+    @Override
+    public void onAttachedToActivity(ActivityPluginBinding binding) {
+        initializePlugin(
+                pluginBinding.getApplicationContext(),
+                binding.getActivity(),
+                pluginBinding.getBinaryMessenger());
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+        activity = null;
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
+        initializePlugin(
+                pluginBinding.getApplicationContext(),
+                binding.getActivity(),
+                pluginBinding.getBinaryMessenger());
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+        activity = null;
     }
 
     @Override
@@ -60,7 +117,7 @@ public class TapjoyPlugin implements MethodCallHandler {
         } else if (call.method.equals("connect")) {
             Hashtable<String, Object> connectFlags = new Hashtable<>();
             String tapjoyKey = call.argument("tapjoyKey");
-            result.success(Tapjoy.connect(activity.getApplicationContext(), tapjoyKey, connectFlags, new TJConnectListener() {
+            result.success(Tapjoy.connect(applicationContext, tapjoyKey, connectFlags, new TJConnectListener() {
                 @Override
                 public void onConnectSuccess() {
                     channel.invokeMethod("connect", "success");
@@ -73,7 +130,7 @@ public class TapjoyPlugin implements MethodCallHandler {
             }));
         } else if (call.method.equals("getPlacement")) {
             String placementName = call.argument("placementName");
-            TJPlacement placement = Tapjoy.getPlacement(placementName, new TJPlacementListenerPlugin(this.registrar, placementName));
+            TJPlacement placement = Tapjoy.getPlacement(placementName, new TJPlacementListenerPlugin(activity, pluginBinding.getBinaryMessenger(), placementName));
             placements.put(placement.getName(), placement);
             result.success(true);
         } else if (call.method.equals("setUserID")) {

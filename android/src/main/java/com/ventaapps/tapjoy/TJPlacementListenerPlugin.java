@@ -1,6 +1,7 @@
 package com.ventaapps.tapjoy;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.tapjoy.TJActionRequest;
 import com.tapjoy.TJConnectListener;
@@ -11,6 +12,7 @@ import com.tapjoy.TJPlacementVideoListener;
 import com.tapjoy.Tapjoy;
 
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
+import io.flutter.plugin.common.BinaryMessenger;
 
 import java.util.HashMap;
 
@@ -22,13 +24,13 @@ import io.flutter.plugin.common.PluginRegistry;
 
 public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandler, TJPlacementListener {
     static MethodChannel channel;
-    PluginRegistry.Registrar registrar;
+    private Activity activity;
     private String placementName;
 
-    TJPlacementListenerPlugin(PluginRegistry.Registrar registrar, String placementName) {
-        this.registrar = registrar;
+    TJPlacementListenerPlugin(Activity activity, BinaryMessenger messenger, String placementName) {
+        this.activity = activity;
         this.placementName = placementName;
-        channel = new MethodChannel(registrar.messenger(), "TJPlacement_" + placementName);
+        channel = new MethodChannel(messenger, "TJPlacement_" + placementName);
         channel.setMethodCallHandler(this);
     }
 
@@ -68,7 +70,7 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
                 placement.setVideoListener(new TJPlacementVideoListener() {
                     @Override
                     public void onVideoStart(TJPlacement tjPlacement) {
-                        registrar.activity().runOnUiThread(new Runnable() {
+                        activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 channel.invokeMethod("onVideoStart", null);
@@ -78,7 +80,7 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
 
                     @Override
                     public void onVideoError(TJPlacement tjPlacement, String s) {
-                        registrar.activity().runOnUiThread(new Runnable() {
+                        activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 channel.invokeMethod("onVideoError", null);
@@ -88,7 +90,7 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
 
                     @Override
                     public void onVideoComplete(TJPlacement tjPlacement) {
-                        registrar.activity().runOnUiThread(new Runnable() {
+                        activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 channel.invokeMethod("onVideoComplete", null);
@@ -106,7 +108,7 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
 
     @Override
     public void onRequestSuccess(TJPlacement tjPlacement) {
-        this.registrar.activity().runOnUiThread(new Runnable() {
+        this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 channel.invokeMethod("onRequestSuccess", null);
@@ -116,7 +118,7 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
 
     @Override
     public void onRequestFailure(TJPlacement tjPlacement, final TJError tjError) {
-        this.registrar.activity().runOnUiThread(new Runnable() {
+        this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Map<String, Object> arguments = new HashMap<>();
@@ -129,7 +131,7 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
 
     @Override
     public void onContentReady(TJPlacement tjPlacement) {
-        this.registrar.activity().runOnUiThread(new Runnable() {
+        this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 channel.invokeMethod("onContentReady", null);
@@ -139,7 +141,7 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
 
     @Override
     public void onContentShow(TJPlacement tjPlacement) {
-        this.registrar.activity().runOnUiThread(new Runnable() {
+        this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 channel.invokeMethod("onContentShow", null);
@@ -149,7 +151,7 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
 
     @Override
     public void onContentDismiss(TJPlacement tjPlacement) {
-        this.registrar.activity().runOnUiThread(new Runnable() {
+        this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 channel.invokeMethod("onContentDismiss", null);
@@ -159,7 +161,7 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
 
     @Override
     public void onPurchaseRequest(TJPlacement tjPlacement, final TJActionRequest tjActionRequest, final String productId) {
-        this.registrar.activity().runOnUiThread(new Runnable() {
+        this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Map<String, Object> arguments = new HashMap<>();
@@ -173,7 +175,7 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
 
     @Override
     public void onRewardRequest(final TJPlacement tjPlacement, final TJActionRequest tjActionRequest, final String itemId, final int quantity) {
-        this.registrar.activity().runOnUiThread(new Runnable() {
+        this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Map<String, Object> arguments = new HashMap<>();
@@ -188,7 +190,7 @@ public class TJPlacementListenerPlugin implements MethodChannel.MethodCallHandle
 
     @Override
     public void onClick(final TJPlacement tjPlacement) {
-        this.registrar.activity().runOnUiThread(new Runnable() {
+        this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
