@@ -37,7 +37,7 @@ public class TapjoyPlugin implements FlutterPlugin, ActivityAware, MethodCallHan
     static MethodChannel channel;
     static private Registrar registrar;
     static Map<String, TJPlacement> placements = new HashMap<>();
-    private Activity activity;
+    public Activity activity;
     private Context applicationContext;
     private BinaryMessenger messenger;
     private FlutterPluginBinding pluginBinding;
