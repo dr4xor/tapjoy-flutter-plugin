@@ -130,7 +130,7 @@ public class TapjoyPlugin implements FlutterPlugin, ActivityAware, MethodCallHan
             }));
         } else if (call.method.equals("getPlacement")) {
             String placementName = call.argument("placementName");
-            TJPlacement placement = Tapjoy.getPlacement(placementName, new TJPlacementListenerPlugin(activity, pluginBinding.getBinaryMessenger(), placementName));
+            TJPlacement placement = Tapjoy.getPlacement(placementName, new TJPlacementListenerPlugin(this, pluginBinding.getBinaryMessenger(), placementName));
             placements.put(placement.getName(), placement);
             result.success(true);
         } else if (call.method.equals("setUserID")) {
